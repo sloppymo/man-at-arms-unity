@@ -1,0 +1,36 @@
+name: Deploy Unity WebGL to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Unity
+      uses: game-ci/unity-test-runner@v4
+      with:
+        unityVersion: 2022.3.0f1
+        
+    - name: Build WebGL
+      uses: game-ci/unity-builder@v4
+      with:
+        targetPlatform: WebGL
+        buildName: Unity-Man-at-Arms
+        buildsPath: build
+        unityVersion: 2022.3.0f1
+        
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      if: github.ref == 'refs/heads/main'
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: build/WebGL
+        destination_dir: webgl
